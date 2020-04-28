@@ -48,71 +48,76 @@
     </div>
   </div>
 
-	<!-- Подключаем jQuery, а также Socket.io -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="/socket.io/socket.io.js"></script>
-	<script>
-		// У каждого пользователя будет случайный стиль для блока с сообщенями,
-		// поэтому в этом кусочке кода мы получаем случайные числа
-		var min = 1;
-		var max = 6;
-		var random = Math.floor(Math.random() * (max - min)) + min;
+  <!-- Подключаем jQuery, а также Socket.io -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // У каждого пользователя будет случайный стиль для блока с сообщенями,
+    // поэтому в этом кусочке кода мы получаем случайные числа
+    let min = 1;
+    let max = 6;
+    var random = Math.floor(Math.random() * (max - min)) + min;
 
-		// Устаналиваем класс в переменную в зависимости от случайного числа
-		// Эти классы взяты из Bootstrap стилей
-		var alertClass;
-		switch (random) {
-			case 1:
-				alertClass = 'secondary';
-				break;
-			case 2:
-				alertClass = 'danger';
-				break;
-			case 3:
-				alertClass = 'success';
-				break;
-			case 4:
-				alertClass = 'warning';
-				break;
-			case 5:
-				alertClass = 'info';
-				break;
-			case 6:
-				alertClass = 'light';
-				break;
-		}
+    // Устаналиваем класс в переменную в зависимости от случайного числа
+    // Эти классы взяты из Bootstrap стилей
+    let alertClass;
+    switch (random) {
+      case 1:
+        alertClass = 'secondary';
+        break;
+      case 2:
+        alertClass = 'danger';
+        break;
+      case 3:
+        alertClass = 'success';
+        break;
+      case 4:
+        alertClass = 'warning';
+        break;
+      case 5:
+        alertClass = 'info';
+        break;
+      case 6:
+        alertClass = 'light';
+        break;
+    }
 
-		// Функция для работы с данными на сайте
-		$(function() {
-			// Включаем socket.io и отслеживаем все подключения
-			var socket = io.connect();
-			// Делаем переменные на:
-			var $form = $("#messForm"); // Форму сообщений
-			var $name = $("#name"); // Поле с именем
-			var $textarea = $("#message"); // Текстовое поле
-			var $all_messages = $("#all_mess"); // Блок с сообщениями
+    // Функция для работы с данными на сайте
+    $(function () {
+      // Включаем socket.io и отслеживаем все подключения
+      let socket = io.connect(),
+        // Делаем переменные на:
+        form = document.getElementById("messForm"), // Форму сообщений
+        name = document.getElementById("name"), // Поле с именем
+        textarea = document.getElementById("message"), // Текстовое поле
+        all_messages = document.getElementById("all_mess"), // Блок с сообщениями
 
-			// Отслеживаем нажатие на кнопку в форме сообщений
-			$form.submit(function(event) {
-				// Предотвращаем классическое поведение формы
-				event.preventDefault();
-				// В сокет отсылаем новое событие 'send mess',
-				// в событие передаем различные параметры и данные
-				socket.emit('send mess', {mess: $textarea.val(), name: $name.val(), className: alertClass});
-				// Очищаем поле с сообщением
-				$textarea.val('');
-			});
+        // Отслеживаем нажатие на кнопку в форме сообщений
+        $form.submit(function (event) {
+          // Предотвращаем классическое поведение формы
+          event.preventDefault();
+          // В сокет отсылаем новое событие 'send mess',
+          // в событие передаем различные параметры и данные
+          socket.emit('send mess', {
+            mess: textarea.val(),
+            name: name.val(),
+            className: alertClass
+          });
+          // Очищаем поле с сообщением
+          textarea.val('');
+        });
 
-			// Здесь отслеживаем событие 'add mess', 
-			// которое должно приходить из сокета в случае добавления нового сообщения
-			socket.on('add mess', function(data) {
-				// Встраиваем полученное сообщение в блок с сообщениями
-				// У блока с сообщением будет тот класс, который соответвует пользователю что его отправил
-				$all_messages.append("<div class='alert alert-" + data.className + "'><b>" + data.name + "</b>: " + data.mess + "</div>");
-			});
+      // Здесь отслеживаем событие 'add mess', 
+      // которое должно приходить из сокета в случае добавления нового сообщения
+      socket.on('add mess', function (data) {
+        // Встраиваем полученное сообщение в блок с сообщениями
+        // У блока с сообщением будет тот класс, который соответвует пользователю что его отправил
+        all_messages.append("<div class='alert alert-" + data.className + "'><b>" + data.name + "</b>: " + data
+          .mess + "</div>");
+      });
 
-		});
-	</script>
+    });
+  </script>
 </body>
 
 </html>
